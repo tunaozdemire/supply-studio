@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE SUPPLY — Design Studio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --orange: #E8722A;
+    --orange-dim: rgba(232,114,42,0.12);
+    --white: #f0f0f0;
+    --gray: #555;
+    --light-gray: #888;
+    --text-muted: #ccc;
+  }
+
+  body.light {
+    --bg: #f4f2ee;
+    --surface: #ffffff;
+    --border: #d0ccc5;
+    --white: #111111;
+    --gray: #aaa;
+    --light-gray: #777;
+    --text-muted: #444;
+    --orange-dim: rgba(232,114,42,0.08);
+  }
+
+  body.light input,
+  body.light select {
+    background: #eeebe5 !important;
+    color: #111111 !important;
+    border-color: #d0ccc5 !important;
+  }
+
+  body.light .card {
+    background: #ffffff;
+    border-color: #d0ccc5;
+  }
+
+  body.light .prompt-block {
+    background: #f9f7f3;
+    border-color: #d0ccc5;
+  }
+
+  body.light .prompt-text {
+    color: #333;
+  }
+
+  body.light .upload-zone {
+    border-color: #d0ccc5;
+  }
+
+  body.light .error-msg {
+    background: rgba(220,50,50,0.06);
+  }
+
+  body.light .btn-small {
+    background: transparent;
+  }
+
+  body.light .loading-bar {
+    background: #d0ccc5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { transition: background-color 0.25s, border-color 0.25s, color 0.25s; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    transition: background 0.25s, color 0.25s;
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 6px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  header h1 span { color: var(--orange); }
+
+  header p {
+    font-size: 11px;
+    color: var(--light-gray);
+    letter-spacing: 3px;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* API KEY */
+  .api-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  input[type="password"], input[type="text"] {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--orange); }
+
+  .btn-small {
+    background: transparent;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 12px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-small:hover { background: var(--orange-dim); }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray);
+    flex-shrink: 0;
+  }
+  .status-dot.active { background: #4caf50; box-shadow: 0 0 6px #4caf50; }
+
+  /* REFERENCE IMAGE */
+  .upload-zone {
+    border: 1px dashed var(--border);
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+
+  .upload-zone:hover { border-color: var(--orange); }
+
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  .upload-zone p {
+    font-size: 11px;
+    color: var(--light-gray);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .upload-zone .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+
+  #ref-preview {
+    max-height: 200px;
+    max-width: 100%;
+    display: none;
+    margin: 0 auto;
+  }
+
+  /* SELECTORS */
+  .selector-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .selector-group label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--light-gray);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 12px 16px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23E8722A' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: var(--orange); }
+
+  /* GENERATE BUTTON */
+  .btn-generate {
+    width: 100%;
+    background: var(--orange);
+    border: none;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    padding: 18px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-generate:hover { opacity: 0.88; }
+  .btn-generate:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* LOADING */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 32px;
+  }
+
+  .loading-bar {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .loading-bar::after {
+    content: '';
+    position: absolute;
+    left: -40%;
+    width: 40%;
+    height: 100%;
+    background: var(--orange);
+    animation: slide 1s linear infinite;
+  }
+
+  @keyframes slide {
+    to { left: 140%; }
+  }
+
+  .loading p {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--light-gray);
+    text-transform: uppercase;
+    margin-top: 16px;
+  }
+
+  /* PROMPTS OUTPUT */
+  .prompts-section {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .prompt-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .prompt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .prompt-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--orange);
+  }
+
+  .prompt-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--light-gray);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .btn-copy {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--light-gray);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .btn-copy:hover { border-color: var(--orange); color: var(--orange); }
+  .btn-copy.copied { border-color: #4caf50; color: #4caf50; }
+
+  .prompt-text {
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+  }
+
+  /* ERROR */
+  .error-msg {
+    display: none;
+    background: rgba(220,50,50,0.1);
+    border: 1px solid rgba(220,50,50,0.3);
+    color: #ff6b6b;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 14px 18px;
+  }
+
+  .mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--light-gray);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 8px 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    z-index: 100;
+  }
+
+  .mode-toggle:hover { border-color: var(--orange); color: var(--orange); }
+
+
+  /* PROMPT BUTTONS */
+  .section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .section-label.gray { color: var(--light-gray); }
+  .section-label.orange { color: var(--orange); }
+
+  .btn-reveal {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--light-gray);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn-reveal:hover { border-color: var(--orange); color: var(--orange); }
+  .btn-reveal.active { border-color: var(--orange); color: var(--orange); }
+
+  .btn-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .prompt-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: 'Space Mono', monospace;
+    padding: 20px 14px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    transition: all 0.2s;
+    min-height: 100px;
+  }
+
+  .prompt-btn:hover {
+    border-color: var(--light-gray);
+    background: var(--bg);
+  }
+
+  .prompt-btn.listing {
+    border-left: 2px solid var(--orange);
+  }
+
+  .prompt-btn.copied {
+    border-color: #4caf50 !important;
+  }
+
+  .pbtn-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--orange);
+    line-height: 1;
+  }
+
+  .prompt-btn.listing .pbtn-num {
+    color: var(--orange);
+  }
+
+  .pbtn-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--white);
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .pbtn-label small {
+    font-size: 9px;
+    color: var(--light-gray);
+    letter-spacing: 1px;
+    text-transform: none;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .pbtn-tick {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 14px;
+    color: #4caf50;
+  }
+
+  .prompt-btn.loading-btn {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .prompt-btn.ready {
+    border-color: var(--border);
+  }
+
+  /* REVEAL PANEL */
+  .reveal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .reveal-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  .reveal-item-header {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .reveal-item-text {
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+  }
+
+  @media (max-width: 600px) {
+    .btn-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+
+  /* LISTING CARDS */
+  .btn-gen-listing {
+    background: var(--orange);
+    border: none;
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-gen-listing:hover { opacity: 0.85; }
+  .btn-gen-listing:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .listing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--orange);
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+
+  .listing-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .listing-card-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--light-gray);
+    text-transform: uppercase;
+  }
+
+  .listing-opts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .listing-opt-group {}
+
+  .listing-opt-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--light-gray);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--light-gray);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover { border-color: var(--orange); color: var(--white); }
+
+  .chip.active {
+    background: var(--orange-dim);
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  body.light .chip {
+    background: #eeebe5;
+    color: #777;
+  }
+
+  body.light .chip.active {
+    background: var(--orange-dim);
+    color: var(--orange);
+  }
+
+  @media (max-width: 600px) {
+    .selector-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="mode-toggle" id="mode-btn" onclick="toggleMode()">☀ Light</button>
+
+<header>
+  <h1>THE <span>SUPPLY</span></h1>
+  <p>Design Prompt Studio — PolishMaster</p>
+</header>
+
+<div class="container">
+
+  <!-- API KEY -->
+  <div class="card">
+    <div class="card-label">Gemini API Key</div>
+    <div class="api-row">
+      <div class="status-dot" id="status-dot"></div>
+      <input type="password" id="api-key" placeholder="AIza..." />
+      <button class="btn-small" onclick="saveKey()">Save</button>
+    </div>
+    <div style="margin-top:16px;">
+      <div style="font-size:10px;letter-spacing:3px;color:var(--light-gray);text-transform:uppercase;margin-bottom:10px;">Model</div>
+      <select id="model-select">
+        <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro Preview — Best reasoning</option>
+        <option value="gemini-2.5-pro-preview-05-06">Gemini 2.5 Pro Preview — Balanced</option>
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash — Fast &amp; cheap</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- REFERENCE IMAGE -->
+  <div class="card">
+    <div class="card-label">Reference Model — VOID CREST</div>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="ref-input" accept="image/*" onchange="handleUpload(event)" />
+      <img id="ref-preview" />
+      <div id="upload-placeholder">
+        <div class="icon">◈</div>
+        <p>Upload reference image</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELECTORS -->
+  <div class="card">
+    <div class="card-label">Model Parameters</div>
+    <div class="selector-grid">
+      <div class="selector-group">
+        <label>Form Type</label>
+        <select id="form-type">
+          <option value="WIDE">WIDE — Low, flattened bowl</option>
+          <option value="TALL">TALL — Cylindrical, elongated</option>
+          <option value="COMPACT">COMPACT — Palm-sized, dense</option>
+          <option value="ANGULAR">ANGULAR — Architectural, cubic</option>
+        </select>
+      </div>
+      <div class="selector-group">
+        <label>Signature Element</label>
+        <select id="signature">
+          <option value="horizontal_ridge">Horizontal Ridge — Sharp equator line</option>
+          <option value="stepped_base">Stepped Base — Layered platform bottom</option>
+          <option value="asymmetric_rim">Asymmetric Rim — One side elevated</option>
+          <option value="vertical_cuts">Vertical Facet Cuts — Deep vertical divisions</option>
+          <option value="tapered_neck">Tapered Neck — Narrowing toward opening</option>
+          <option value="floating_base">Floating Base — Thin foot, elevated body</option>
+          <option value="dual_body">Dual Body — Two merged geometries</option>
+          <option value="crown_rim">Crown Rim — Irregular, crown-like opening</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="btn-generate" id="gen-btn" onclick="generate()">GENERATE PROMPTS</button>
+
+  <!-- ERROR -->
+  <div class="error-msg" id="error-msg"></div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div class="loading-bar"></div>
+    <p>Generating prompts...</p>
+  </div>
+
+  <!-- HIDDEN PROMPT TEXTS -->
+  <div style="display:none">
+    <div id="prompt-1"></div>
+    <div id="prompt-2"></div>
+    <div id="prompt-3"></div>
+    <div id="prompt-4"></div>
+    <div id="prompt-5"></div>
+    <div id="prompt-6"></div>
+    <div id="prompt-7"></div>
+    <div id="prompt-8"></div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="prompts-section" id="prompts-section">
+
+    <div class="section-header-row">
+      <div class="section-label gray">MODEL GENERATION — MATTE CLAY</div>
+      <button class="btn-reveal" id="reveal-btn" onclick="toggleReveal()">SHOW PROMPTS</button>
+    </div>
+
+    <div class="btn-grid">
+      <button class="prompt-btn" id="pbtn-1" onclick="copyPrompt(1)">
+        <span class="pbtn-num">01</span>
+        <span class="pbtn-label">Main View<br><small>45° Front Edit</small></span>
+        <span class="pbtn-tick" id="tick-1"></span>
+      </button>
+      <button class="prompt-btn" id="pbtn-2" onclick="copyPrompt(2)">
+        <span class="pbtn-num">02</span>
+        <span class="pbtn-label">Side Profile<br><small>Full Silhouette</small></span>
+        <span class="pbtn-tick" id="tick-2"></span>
+      </button>
+      <button class="prompt-btn" id="pbtn-3" onclick="copyPrompt(3)">
+        <span class="pbtn-num">03</span>
+        <span class="pbtn-label">Top Down<br><small>Interior View</small></span>
+        <span class="pbtn-tick" id="tick-3"></span>
+      </button>
+    </div>
+
+    <!-- LISTING VISUALS -->
+    <div class="section-header-row" style="margin-top:24px;">
+      <div class="section-label orange">LISTING VISUALS — MIRROR POLISHED</div>
+      <button class="btn-gen-listing" id="gen-listing-btn" onclick="generateListing()">GENERATE</button>
+    </div>
+
+    <!-- 04 LIFESTYLE -->
+    <div class="listing-card">
+      <div class="listing-card-header">
+        <span class="pbtn-num" style="font-size:20px;">04</span>
+        <span class="listing-card-title">LIFESTYLE SHOT</span>
+      </div>
+      <div class="listing-opts-grid">
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Object Color</div>
+          <div class="chip-row" data-group="ls_color">
+            <button class="chip active" data-val="mirror-polished black">Black</button>
+            <button class="chip" data-val="mirror-polished deep forest green">Forest Green</button>
+            <button class="chip" data-val="mirror-polished ivory white">Ivory White</button>
+            <button class="chip" data-val="mirror-polished terracotta">Terracotta</button>
+            <button class="chip" data-val="mirror-polished deep navy blue">Navy Blue</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Setting</div>
+          <div class="chip-row" data-group="ls_setting">
+            <button class="chip active" data-val="white marble surface">Marble</button>
+            <button class="chip" data-val="warm oak wood desk">Oak Desk</button>
+            <button class="chip" data-val="raw concrete shelf">Concrete</button>
+            <button class="chip" data-val="soft linen fabric">Linen</button>
+            <button class="chip" data-val="dark slate stone surface">Slate</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Lighting</div>
+          <div class="chip-row" data-group="ls_light">
+            <button class="chip active" data-val="warm soft ambient light">Warm Ambient</button>
+            <button class="chip" data-val="cool natural daylight">Cool Daylight</button>
+            <button class="chip" data-val="dramatic single side light">Dramatic Side</button>
+            <button class="chip" data-val="golden hour window light">Golden Hour</button>
+          </div>
+        </div>
+      </div>
+      <button class="prompt-btn listing" id="pbtn-4" onclick="copyPrompt(4)" style="margin-top:12px;width:100%">
+        <span class="pbtn-num">04</span>
+        <span class="pbtn-label">Lifestyle Shot<br><small>Copy Prompt</small></span>
+        <span class="pbtn-tick" id="tick-4"></span>
+      </button>
+    </div>
+
+    <!-- 05 HERO HAND -->
+    <div class="listing-card">
+      <div class="listing-card-header">
+        <span class="pbtn-num" style="font-size:20px;">05</span>
+        <span class="listing-card-title">HERO HAND SHOT</span>
+      </div>
+      <div class="listing-opts-grid">
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Object Color</div>
+          <div class="chip-row" data-group="hh_color">
+            <button class="chip active" data-val="mirror-polished black">Black</button>
+            <button class="chip" data-val="mirror-polished deep forest green">Forest Green</button>
+            <button class="chip" data-val="mirror-polished terracotta">Terracotta</button>
+            <button class="chip" data-val="mirror-polished ivory white">Ivory White</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Photo Style</div>
+          <div class="chip-row" data-group="hh_style">
+            <button class="chip active" data-val="black and white photography, high contrast monochrome">B&W</button>
+            <button class="chip" data-val="full color photography, vivid and sharp">Full Color</button>
+            <button class="chip" data-val="desaturated color, muted tones">Muted Color</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Lighting</div>
+          <div class="chip-row" data-group="hh_light">
+            <button class="chip active" data-val="single dramatic side lighting, sharp shadow">Dramatic Side</button>
+            <button class="chip" data-val="soft diffused studio lighting">Soft Studio</button>
+            <button class="chip" data-val="hard top light, strong contrast">Hard Top</button>
+          </div>
+        </div>
+      </div>
+      <button class="prompt-btn listing" id="pbtn-5" onclick="copyPrompt(5)" style="margin-top:12px;width:100%">
+        <span class="pbtn-num">05</span>
+        <span class="pbtn-label">Hero Hand Shot<br><small>Copy Prompt</small></span>
+        <span class="pbtn-tick" id="tick-5"></span>
+      </button>
+    </div>
+
+    <!-- 06 RAW PRINT -->
+    <div class="listing-card">
+      <div class="listing-card-header">
+        <span class="pbtn-num" style="font-size:20px;">06</span>
+        <span class="listing-card-title">RAW PRINT SHOT</span>
+      </div>
+      <div class="listing-opts-grid">
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Filament Color</div>
+          <div class="chip-row" data-group="rp_color">
+            <button class="chip active" data-val="matte black filament">Black</button>
+            <button class="chip" data-val="dark charcoal gray filament">Dark Gray</button>
+            <button class="chip" data-val="matte white filament">White</button>
+            <button class="chip" data-val="dark green filament">Dark Green</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Shot Angle</div>
+          <div class="chip-row" data-group="rp_angle">
+            <button class="chip active" data-val="held in black gloved hand from below">Hand Held</button>
+            <button class="chip" data-val="placed on flat white surface, slight elevation angle">Flat Surface</button>
+            <button class="chip" data-val="45 degree elevated angle, floating on white">45° Elevated</button>
+          </div>
+        </div>
+      </div>
+      <button class="prompt-btn listing" id="pbtn-6" onclick="copyPrompt(6)" style="margin-top:12px;width:100%">
+        <span class="pbtn-num">06</span>
+        <span class="pbtn-label">Raw Print Shot<br><small>Copy Prompt</small></span>
+        <span class="pbtn-tick" id="tick-6"></span>
+      </button>
+    </div>
+
+    <!-- 07 DIMENSION -->
+    <div class="listing-card">
+      <div class="listing-card-header">
+        <span class="pbtn-num" style="font-size:20px;">07</span>
+        <span class="listing-card-title">DIMENSION DIAGRAM</span>
+      </div>
+      <div class="listing-opts-grid">
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Diagram Style</div>
+          <div class="chip-row" data-group="dd_style">
+            <button class="chip active" data-val="flat vector illustration, solid orange #E8722A fill, dark brown outline">Orange Flat</button>
+            <button class="chip" data-val="technical blueprint style, white lines on dark navy background">Blueprint</button>
+            <button class="chip" data-val="minimal line art, black outlines only, white background">Minimal Line</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Measurement Label</div>
+          <div class="chip-row" data-group="dd_size">
+            <button class="chip active" data-val="95 MM">95 MM</button>
+            <button class="chip" data-val="120 MM">120 MM</button>
+            <button class="chip" data-val="80 MM">80 MM</button>
+            <button class="chip" data-val="150 MM">150 MM</button>
+          </div>
+        </div>
+      </div>
+      <button class="prompt-btn listing" id="pbtn-7" onclick="copyPrompt(7)" style="margin-top:12px;width:100%">
+        <span class="pbtn-num">07</span>
+        <span class="pbtn-label">Dimension Diagram<br><small>Copy Prompt</small></span>
+        <span class="pbtn-tick" id="tick-7"></span>
+      </button>
+    </div>
+
+    <!-- 08 COLOR VARIANTS -->
+    <div class="listing-card">
+      <div class="listing-card-header">
+        <span class="pbtn-num" style="font-size:20px;">08</span>
+        <span class="listing-card-title">COLOR VARIANTS</span>
+      </div>
+      <div class="listing-opts-grid">
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Color Set</div>
+          <div class="chip-row" data-group="cv_colors">
+            <button class="chip active" data-val="mirror-polished black, mirror-polished dark gray, mirror-polished deep forest green">Dark Trio</button>
+            <button class="chip" data-val="mirror-polished terracotta, mirror-polished cream white, mirror-polished warm brown">Earth Tones</button>
+            <button class="chip" data-val="mirror-polished black, mirror-polished charcoal, mirror-polished slate gray">Monochrome</button>
+            <button class="chip" data-val="mirror-polished emerald green, mirror-polished sapphire blue, mirror-polished burgundy">Jewel Tones</button>
+          </div>
+        </div>
+        <div class="listing-opt-group">
+          <div class="listing-opt-label">Background</div>
+          <div class="chip-row" data-group="cv_bg">
+            <button class="chip active" data-val="pure white background with soft ground reflection">White + Reflection</button>
+            <button class="chip" data-val="off-white warm background, minimal shadow">Off-White</button>
+            <button class="chip" data-val="very dark background, near black">Dark Background</button>
+          </div>
+        </div>
+      </div>
+      <button class="prompt-btn listing" id="pbtn-8" onclick="copyPrompt(8)" style="margin-top:12px;width:100%">
+        <span class="pbtn-num">08</span>
+        <span class="pbtn-label">Color Variants<br><small>Copy Prompt</small></span>
+        <span class="pbtn-tick" id="tick-8"></span>
+      </button>
+    </div>
+
+    <!-- REVEAL PANEL -->
+    <div id="reveal-panel" style="display:none; margin-top:16px;">
+      <div class="reveal-list" id="reveal-list"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let apiKey = localStorage.getItem('pm_gemini_key') || '';
+  let refImageBase64 = localStorage.getItem('pm_ref_image') || '';
+
+  // Mode
+  const savedMode = localStorage.getItem('pm_mode') || 'dark';
+  if (savedMode === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('mode-btn').textContent = '☾ Dark';
+  }
+
+  function toggleMode() {
+    const isLight = document.body.classList.toggle('light');
+    const btn = document.getElementById('mode-btn');
+    btn.textContent = isLight ? '☾ Dark' : '☀ Light';
+    localStorage.setItem('pm_mode', isLight ? 'light' : 'dark');
+  }
+
+  // Init
+  if (apiKey) {
+    document.getElementById('api-key').value = apiKey;
+    document.getElementById('status-dot').classList.add('active');
+  }
+
+  if (refImageBase64) {
+    const preview = document.getElementById('ref-preview');
+    preview.src = refImageBase64;
+    preview.style.display = 'block';
+    document.getElementById('upload-placeholder').style.display = 'none';
+  }
+
+  function saveKey() {
+    apiKey = document.getElementById('api-key').value.trim();
+    if (apiKey) {
+      localStorage.setItem('pm_gemini_key', apiKey);
+      document.getElementById('status-dot').classList.add('active');
+    }
+  }
+
+  function handleUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      refImageBase64 = ev.target.result;
+      localStorage.setItem('pm_ref_image', refImageBase64);
+      const preview = document.getElementById('ref-preview');
+      preview.src = refImageBase64;
+      preview.style.display = 'block';
+      document.getElementById('upload-placeholder').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('error-msg').style.display = 'none';
+  }
+
+  async function generate() {
+    hideError();
+
+    if (!apiKey) return showError('API key missing. Save your Gemini key first.');
+    if (!refImageBase64) return showError('Reference image missing. Upload VOID CREST reference first.');
+
+    const formType = document.getElementById('form-type').value;
+    const signature = document.getElementById('signature').value;
+    const modelId = document.getElementById('model-select').value;
+
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('prompts-section').style.display = 'none';
+    document.getElementById('gen-btn').disabled = true;
+    document.getElementById('reveal-panel').style.display = 'none';
+    document.getElementById('reveal-btn').textContent = 'SHOW PROMPTS';
+    document.getElementById('reveal-btn').classList.remove('active');
+    for (let i = 1; i <= 8; i++) {
+      const pb = document.getElementById('pbtn-' + i);
+      const tk = document.getElementById('tick-' + i);
+      if (pb) { pb.classList.add('loading-btn'); pb.classList.remove('ready','copied'); }
+      if (tk) tk.textContent = '';
+    }
+
+    const formDescriptions = {
+      WIDE: 'wide, low, flattened bowl — width is 2x the height, very shallow profile',
+      TALL: 'tall cylindrical body — height is 2x the width, elongated vertical form',
+      COMPACT: 'same compact proportions as reference, slightly denser and more compressed',
+      ANGULAR: 'cube-like body with sharp architectural corners, minimal organic curvature'
+    };
+
+  const signatureDescriptions = {
+      horizontal_ridge: 'a single sharp horizontal ridge along the outer equator, dividing upper and lower facet groups',
+      stepped_base: 'a stepped platform base — bottom transitions through 2 horizontal levels before the ground',
+      asymmetric_rim: 'an asymmetric rim where one side of the opening sits noticeably higher, creating a tilted top plane',
+      vertical_cuts: 'deep vertical facet cuts that divide the body into clear vertical sections from rim to base',
+      tapered_neck: 'a tapered neck just below the rim — body widens at mid-height then narrows toward the top',
+      floating_base: 'a thin recessed foot ring that lifts the body slightly off the ground, floating appearance',
+      dual_body: 'a dual-body form — larger lower mass supports a smaller upper geometric form, two volumes merged',
+      crown_rim: 'an irregular crown-like rim where the top opening has uneven peaks and recesses around its perimeter'
+    };
+
+    const fd = formDescriptions[formType];
+    const sd = signatureDescriptions[signature];
+    const base64Data = refImageBase64.split(',')[1];
+    const mimeType = refImageBase64.split(';')[0].split(':')[1];
+
+    const DNA = `PolishMaster vessel design DNA: large soft facets, octagonal geometric rim, flat base, open interior top, no undercuts, no details smaller than 1cm, gradual surface transitions, convex or flat dominant surfaces.`;
+
+    // STATIC TEMPLATES for prompts 1-3 (no API needed - direct injection)
+    const staticPrompts = {
+      1: `Transform this object into a new vessel while preserving its core design language. The new form is a ${fd}. Add the following signature element: ${sd}. Maintain all existing design rules: large soft geometric facets across the body, octagonal or geometric rim opening, flat base, open hollow top interior. Surface: uniform flat matte clay gray, no reflections, no gloss, no specularity whatsoever. Every single facet plane must be individually visible and distinguishable. Lighting: perfectly even multi-directional studio light from all sides equally — zero blown highlights, zero deep shadows, all geometry readable. Background: pure white. Small soft ground shadow. Camera: 45-degree elevated three-quarter front view. No surface texture patterns, no decorative elements, no depth of field, no post-processing effects. This is a geometry reference render for 3D mesh generation — clarity of form is the only goal. 16:9 aspect ratio, 1920x1080px.`,
+
+      2: `A ${fd} vessel with ${sd}, featuring large soft geometric facets, octagonal rim opening, flat base, open hollow top. Rendered from a pure exact 90-degree side profile view — camera perfectly perpendicular, no perspective tilt. Complete silhouette visible from flat base to rim. Surface: flat matte clay gray #999999, no reflections, no gloss. Lighting: perfectly even studio illumination from all directions — every facet individually distinguishable, no shadows on the vessel body, only a small soft ground shadow. Background: pure white seamless. No depth of field, no bokeh, no post-processing, no textures, no decorations. Side profile geometry reference render, 16:9 aspect ratio, 1920x1080px.`,
+
+      3: `A ${fd} vessel with ${sd}, featuring large soft geometric facets, octagonal rim opening. Camera positioned directly overhead, perfectly vertical, looking straight down into the vessel. Interior cavity fully visible — show the depth of the hollow opening and the inner wall thickness. The octagonal or geometric rim edge must be sharply defined and legible from above. Surface: flat matte clay gray #999999, no reflections. Lighting: even overhead softbox — no hard shadows inside the cavity, each top-facing facet distinguishable through subtle tonal variation. Background: pure white. No perspective angle, no tilt, no reflections, no depth of field. Top-down geometry reference render, 16:9 aspect ratio, 1920x1080px.`
+    };
+
+    // Inject static prompts immediately
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('prompt-' + i);
+      if (el) el.textContent = staticPrompts[i];
+    }
+
+    // Only call API for prompts 4-8 (kept minimal, just show placeholders)
+    const promptDefs = [
+      {
+        num: 4,
+        system: `Write a single image generation prompt (150-200 words) for a commercial product photo. Subject: mirror-polished black ${fd} vessel with ${sd}, large soft facets, octagonal rim, mirror-polished black surface. Scene: vessel on white marble, single dark succulent inside, warm soft ambient light, cream background slightly out of focus, second identical vessel blurred in background. Style: premium editorial product photography, Kinfolk magazine aesthetic. Camera: 80mm lens, f/4, shallow depth of field. Negative: no artificial bokeh, no oversaturation. End: "16:9 aspect ratio, 1920x1080px." Return ONLY the prompt text, no preamble.`,
+        useImage: false
+      },
+      {
+        num: 5,
+        system: `Write a single image generation prompt (150-200 words) for a product hand shot. Subject: ${fd} vessel with ${sd}, ${getChipVal('hh_color')} mirror-polished finish. Black nitrile-gloved right hand, palm up, vessel resting in palm. ${getChipVal('hh_style')}. ${getChipVal('hh_light')}. One clean specular highlight on dominant facet. Pure white background. Camera: 100mm macro, f/5.6, full sharpness. Negative: no two hands, no background elements, no casual grip. End: "16:9 aspect ratio, 1920x1080px." Return ONLY the prompt text, no preamble.`,
+        useImage: false
+      },
+      {
+        num: 6,
+        system: `Write a single image generation prompt (150-200 words) for a raw 3D print shot. Subject: ${fd} vessel with ${sd}, raw FDM 3D printed state, visible horizontal layer lines at 0.16mm intervals, ${getChipVal('rp_color')}, no polishing. ${getChipVal('rp_angle')}. Raking light from upper-left to catch layer texture. Pure white background, soft shadow. Camera: 85mm, f/8, everything sharp. Negative: no smoothing, no gloss, no post-processing. End: "16:9 aspect ratio, 1920x1080px." Return ONLY the prompt text, no preamble.`,
+        useImage: false
+      },
+      {
+        num: 7,
+        system: `Write a single image generation prompt (100-150 words) for a technical dimension diagram. Subject: ${fd} vessel with ${sd}. Style: ${getChipVal('dd_style')}. Vertical measurement arrow on left labeled "${getChipVal('dd_size')}". Clean geometric sans-serif typography. No shadows, no gradients, no photography. End: "16:9 aspect ratio, 1920x1080px, flat vector illustration." Return ONLY the prompt text, no preamble.`,
+        useImage: false
+      },
+      {
+        num: 8,
+        system: `Write a single image generation prompt (150-200 words) for a color variants product shot. Three identical ${fd} vessels with ${sd}, side by side, evenly spaced. Left: ${(getChipVal('cv_colors').split(',')[0]||'mirror-polished black').trim()}. Center: ${(getChipVal('cv_colors').split(',')[1]||'mirror-polished dark gray').trim()}. Right: ${(getChipVal('cv_colors').split(',')[2]||'mirror-polished forest green').trim()}. ${getChipVal('cv_bg')}. Symmetric 3-point studio lighting. All three vessels identical scale and sharpness. Camera: f/11, all sharp. Negative: no size variation, no different lighting per vessel. End: "16:9 aspect ratio, 1920x1080px." Return ONLY the prompt text, no preamble.`,
+        useImage: false
+      }
+    ];
+
+    const loadingEl = document.getElementById('loading');
+    const loadingText = loadingEl.querySelector('p');
+
+    // Show section immediately since prompts 1-3 are already ready
+    document.getElementById('prompts-section').style.display = 'flex';
+    for (let i = 1; i <= 3; i++) {
+      const pb = document.getElementById('pbtn-' + i);
+      if (pb) { pb.classList.remove('loading-btn'); pb.classList.add('ready'); }
+    }
+
+    try {
+      for (const def of promptDefs) {
+        loadingText.textContent = `Generating listing prompt ${def.num - 3} of 5...`;
+
+        const parts = [{ text: def.system }];
+        if (def.useImage) {
+          parts.push({ inline_data: { mime_type: mimeType, data: base64Data } });
+        }
+
+        let text = '';
+        let attempts = 0;
+        while (attempts < 2) {
+          attempts++;
+          try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts }],
+                generationConfig: { temperature: 0.6, maxOutputTokens: 1024 }
+              })
+            });
+            if (response.status === 429) {
+              await new Promise(r => setTimeout(r, 3000));
+              continue;
+            }
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error?.message || 'API error on prompt ' + def.num);
+            const candidate = data.candidates?.[0];
+            if (!candidate) throw new Error('No candidate returned for prompt ' + def.num);
+            if (candidate.finishReason === 'SAFETY') throw new Error('Content filtered by safety system on prompt ' + def.num);
+            text = candidate.content?.parts?.[0]?.text?.trim() || '';
+            if (!text) throw new Error('Empty response for prompt ' + def.num);
+            break;
+          } catch(retryErr) {
+            if (attempts >= 2) throw retryErr;
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+        const el = document.getElementById('prompt-' + def.num);
+        if (el) el.textContent = text;
+
+        // Show section progressively
+        if (def.num === 1) {
+          document.getElementById('prompts-section').style.display = 'flex';
+        }
+        // Mark button as ready
+        const pbtn = document.getElementById('pbtn-' + def.num);
+        if (pbtn) {
+          pbtn.classList.remove('loading-btn');
+          pbtn.classList.add('ready');
+        }
+      }
+
+      document.getElementById('prompts-section').scrollIntoView({ behavior: 'smooth' });
+
+    } catch (err) {
+      showError('Error: ' + err.message);
+    } finally {
+      loadingEl.style.display = 'none';
+      loadingText.textContent = 'Generating prompts...';
+      document.getElementById('gen-btn').disabled = false;
+    }
+  }
+
+  const promptLabels = {
+    1: 'Main View — 45° Front Edit',
+    2: 'Side Profile — Full Silhouette',
+    3: 'Top Down — Interior View',
+    4: 'Lifestyle Shot — Marble Surface',
+    5: 'Hero Hand Shot — B&W Glove',
+    6: 'Raw Print — Layer Lines',
+    7: 'Dimension Diagram — Orange',
+    8: 'Color Variants — 3 Colors'
+  };
+
+  function copyPrompt(num) {
+    const el = document.getElementById('prompt-' + num);
+    const text = el ? el.textContent.trim() : '';
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('pbtn-' + num);
+      const tick = document.getElementById('tick-' + num);
+      if (btn) btn.classList.add('copied');
+      if (tick) tick.textContent = '✓';
+      setTimeout(() => {
+        if (btn) btn.classList.remove('copied');
+        if (tick) tick.textContent = '';
+      }, 2500);
+    });
+  }
+
+  function toggleReveal() {
+    const panel = document.getElementById('reveal-panel');
+    const btn = document.getElementById('reveal-btn');
+    const list = document.getElementById('reveal-list');
+    const isVisible = panel.style.display === 'flex';
+
+    if (!isVisible) {
+      // Build reveal list
+      list.innerHTML = '';
+      for (let i = 1; i <= 8; i++) {
+        const text = document.getElementById('prompt-' + i)?.textContent?.trim();
+        if (!text) continue;
+        const item = document.createElement('div');
+        item.className = 'reveal-item';
+        item.innerHTML = '<div class="reveal-item-header">' + String(i).padStart(2,'0') + ' — ' + (promptLabels[i] || '') + '</div><div class="reveal-item-text">' + text + '</div>';
+        list.appendChild(item);
+      }
+      panel.style.display = 'flex';
+      btn.classList.add('active');
+      btn.textContent = 'HIDE PROMPTS';
+    } else {
+      panel.style.display = 'none';
+      btn.classList.remove('active');
+      btn.textContent = 'SHOW PROMPTS';
+    }
+  }
+  // Chip selection
+  document.querySelectorAll('.chip-row').forEach(row => {
+    row.addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      row.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  function getChipVal(group) {
+    const row = document.querySelector(`.chip-row[data-group="${group}"]`);
+    if (!row) return '';
+    const active = row.querySelector('.chip.active');
+    return active ? active.dataset.val : '';
+  }
+
+  async function generateListing() {
+    const modelId = document.getElementById('model-select').value;
+    if (!apiKey) return showError('API key missing.');
+
+    const formType = document.getElementById('form-type').value;
+    const signature = document.getElementById('signature').value;
+    const btn = document.getElementById('gen-listing-btn');
+    btn.disabled = true;
+    btn.textContent = 'GENERATING...';
+    hideError();
+
+    const fd = formType === 'WIDE' ? 'wide low-profile bowl vessel, width 2x height' :
+               formType === 'TALL' ? 'tall cylindrical vessel, height 2x width' :
+               formType === 'COMPACT' ? 'compact palm-sized bowl vessel' :
+               'angular cube-like vessel with architectural corners';
+    const sd = signatureDescriptions[signature];
+    const vesselDesc = `a ${fd} with ${sd}, featuring large soft facets, octagonal or geometric rim opening, mirror-polished surface with deep reflective clarity`;
+
+    const listingDefs = [
+      {
+        num: 4,
+        build: () => {
+          const color = getChipVal('ls_color');
+          const setting = getChipVal('ls_setting');
+          const light = getChipVal('ls_light');
+          return `You are a creative director writing a prompt for GPT Image 2. Write a single detailed image generation prompt for a premium lifestyle product photograph.
+
+SUBJECT: ${vesselDesc}. Surface finish: ${color}, mirror-polished to jewelry quality — the surface reflects the environment with photographic fidelity. A single mature dark succulent plant with textured fleshy leaves sits inside the vessel.
+
+SCENE COMPOSITION: The vessel is placed on ${setting}. A second identical vessel sits in the soft background, 30% smaller due to perspective, slightly blurred. The composition follows the rule of thirds — vessel positioned left-center, background vessel right-center.
+
+LIGHTING: ${light}. Key light from upper-left at 45 degrees, soft fill from opposite side, no harsh shadows. The polished surface shows clean, controlled specular highlights — one main highlight only, not blown out.
+
+CAMERA: Shot on Phase One IQ4 medium format camera, 80mm lens, f/4, shallow depth of field — vessel in sharp focus, background and foreground softly blurred. Slight warm color grade.
+
+STYLE: High-end editorial product photography, similar to how luxury ceramics are photographed for Wallpaper* or Kinfolk magazine. Natural, aspirational, premium.
+
+NEGATIVE: No artificial looking bokeh, no oversaturation, no HDR look, no floating product compositing, no white background — the scene has environmental depth.
+
+Write as a single paragraph 200-300 words. End: "16:9 aspect ratio, 1920x1080px, commercial product photography." Return ONLY the prompt.`;
+        }
+      },
+      {
+        num: 5,
+        build: () => {
+          const color = getChipVal('hh_color');
+          const style = getChipVal('hh_style');
+          const light = getChipVal('hh_light');
+          return `You are a creative director writing a prompt for GPT Image 2. Write a single detailed image generation prompt for a hero product hand shot.
+
+SUBJECT: ${vesselDesc}. Surface finish: ${color}. The vessel surface shows exceptional mirror-polish quality — you can see the reflection of the gloved hand in the polished facets.
+
+HAND: A single black nitrile latex examination glove on the right hand. Palm faces upward, fingers slightly cupped — a confident, controlled "offering" grip. The vessel rests in the palm, cradled from below. The glove surface shows fine material detail — slight texture of latex, knuckle creases. Wrist visible, arm extending from bottom-right frame edge.
+
+PHOTOGRAPHY STYLE: ${style}. ${light}. Single dramatic light source from camera left at 35 degrees — creates one clean specular highlight running along the dominant facet plane of the vessel. The rest of the vessel falls into controlled deep shadow, amplifying the mirror quality of the polished surface.
+
+BACKGROUND: Pure white #FFFFFF, seamless. No environment, no props, no distractions — only hand and vessel.
+
+COMPOSITION: Vessel centered in frame, hand entering from bottom right. Negative space on left creates breathing room. The vessel takes up approximately 40% of frame height.
+
+CAMERA: 100mm macro lens equivalent, f/5.6, perfectly sharp throughout subject, zero depth of field blur.
+
+STYLE REFERENCE: Product advertising photography for luxury hardware or precision instruments.
+
+NEGATIVE: No two hands, no forearm tattoos, no casual grip, no background reflections, no dirty gloves.
+
+Write as a single paragraph 200-300 words. End: "16:9 aspect ratio, 1920x1080px, premium product hand shot." Return ONLY the prompt.`;
+        }
+      },
+      {
+        num: 6,
+        build: () => {
+          const color = getChipVal('rp_color');
+          const angle = getChipVal('rp_angle');
+          return `You are a creative director writing a prompt for GPT Image 2. Write a single detailed image generation prompt for a raw 3D print product shot.
+
+SUBJECT: The exact same vessel geometry as ${fd}, with ${sd}, but in its raw 3D printed state — before any surface finishing. The surface is covered in visible FDM layer lines running horizontally around the entire form. Each layer approximately 0.16mm thick, creating a fine ribbed texture across all facets. Material: ${color}. The facet planes are clearly defined but their surfaces show the characteristic matte, slightly rough quality of unfinished PLA filament. Small layer adhesion imperfections visible on close inspection.
+
+PRESENTATION: ${angle}. The vessel is in sharp focus throughout.
+
+LIGHTING: Soft neutral studio lighting, slightly raking from upper-left at a low angle — this angle catches the layer line texture and makes it clearly visible across all surface planes. Fill light from right to prevent harsh shadows.
+
+BACKGROUND: Pure white #FFFFFF, seamless. Minimal ground shadow.
+
+CAMERA: Product photography setup, 85mm lens, f/8, deep focus — every layer line on every facet is sharp.
+
+CONTEXT: This image will be used as a "before" comparison alongside the mirror-polished version. The contrast between raw texture and finished surface is the story.
+
+NEGATIVE: No post-processing to hide layer lines, no smoothing filter, no gloss — the rawness must be evident. No colored background.
+
+Write as a single paragraph 200-300 words. End: "16:9 aspect ratio, 1920x1080px, raw 3D print product shot." Return ONLY the prompt.`;
+        }
+      },
+      {
+        num: 7,
+        build: () => {
+          const style = getChipVal('dd_style');
+          const size = getChipVal('dd_size');
+          return `You are a creative director writing a prompt for GPT Image 2. Write a single detailed image generation prompt for a technical dimension diagram.
+
+SUBJECT: The vessel silhouette — ${fd}, with ${sd}. The vessel is shown in a clean front-facing three-quarter elevation view, slightly above eye level.
+
+VISUAL STYLE: ${style}. No gradients. No shadows. No photographic realism. Pure graphic design aesthetic.
+
+DIMENSION ANNOTATION: A clean vertical measurement arrow on the left side of the vessel. The arrow has flat-headed terminators (not filled arrowheads). A thin leader line connects to the vessel at top and bottom. The measurement label reads "${size}" in clean sans-serif typography, centered beside the arrow. The number and unit should be clearly legible.
+
+COMPOSITION: Vessel occupies center-right of frame. Dimension annotation sits in the left third. Generous white space around all elements. No clutter.
+
+TYPOGRAPHY: Clean geometric sans-serif for the measurement label. No decorative fonts.
+
+NEGATIVE: No photography, no 3D rendering shadows, no gradients, no background texture, no additional annotations, no logo, no frame border.
+
+Write as a single paragraph 150-250 words. End: "16:9 aspect ratio, 1920x1080px, technical product dimension diagram, flat vector style." Return ONLY the prompt.`;
+        }
+      },
+      {
+        num: 8,
+        build: () => {
+          const colors = getChipVal('cv_colors');
+          const bg = getChipVal('cv_bg');
+          const colorList = colors.split(',').map(c => c.trim());
+          const c1 = colorList[0] || 'mirror-polished black';
+          const c2 = colorList[1] || 'mirror-polished dark gray';
+          const c3 = colorList[2] || 'mirror-polished deep forest green';
+          return `You are a creative director writing a prompt for GPT Image 2. Write a single detailed image generation prompt for a color variants product photograph.
+
+SUBJECT: Three identical vessels — exact same geometry: ${fd}, with ${sd}. Each vessel is mirror-polished to the same exceptional quality, differing only in color. Left vessel: ${c1}. Center vessel: ${c2}. Right vessel: ${c3}. All three show the same quality of mirror-polish finish — deep specular clarity, environmental reflections visible in the polished facets.
+
+ARRANGEMENT: Three vessels in a horizontal row, evenly spaced, all at exactly the same scale. The vessels are at a consistent 3/4 front view, slightly elevated camera angle. Each vessel is perfectly in focus.
+
+LIGHTING: Identical studio lighting for all three — symmetric 3-point setup, soft key from upper left, fill from right, subtle top light. Each vessel has one clean specular highlight on its dominant front facet, consistent position across all three.
+
+BACKGROUND: ${bg}. The reflection below each vessel is subtle and equal across all three.
+
+CAMERA: Wide studio lens, f/11, everything razor sharp, no depth of field variation between vessels.
+
+STYLING: Commercial product catalog style — clean, professional, consistent. No lifestyle elements, no props, no plants.
+
+NEGATIVE: No size variation between vessels, no different lighting per vessel, no post-processing color grading differences, no uneven spacing.
+
+Write as a single paragraph 200-300 words. End: "16:9 aspect ratio, 1920x1080px, color variants commercial product photography." Return ONLY the prompt.`;
+        }
+      }
+    ];
+
+    for (const def of listingDefs) {
+      btn.textContent = `GENERATING ${def.num}/8...`;
+      try {
+        let listText = '';
+        let listAttempts = 0;
+        while (listAttempts < 2) {
+          listAttempts++;
+          try {
+            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: def.build() }] }],
+                generationConfig: { temperature: 0.6, maxOutputTokens: 1024 }
+              })
+            });
+            if (resp.status === 429) { await new Promise(r => setTimeout(r, 3000)); continue; }
+            const data = await resp.json();
+            if (!resp.ok) throw new Error(data.error?.message || 'API error on ' + def.num);
+            const candidate = data.candidates?.[0];
+            if (!candidate || candidate.finishReason === 'SAFETY') throw new Error('Blocked on prompt ' + def.num);
+            listText = candidate.content?.parts?.[0]?.text?.trim() || '';
+            if (!listText) throw new Error('Empty on prompt ' + def.num);
+            break;
+          } catch(e2) {
+            if (listAttempts >= 2) throw e2;
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+        const el = document.getElementById('prompt-' + def.num);
+        if (el) el.textContent = listText;
+        const pbtn = document.getElementById('pbtn-' + def.num);
+        if (pbtn) pbtn.classList.remove('loading-btn');
+      } catch(e) {
+        showError('Error on prompt ' + def.num + ': ' + e.message);
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'REGENERATE';
+  }
+
+</script>
+</body>
+</html>
